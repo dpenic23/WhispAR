@@ -46,9 +46,11 @@ public class GameController : MonoBehaviour {
 
 	private static bool initialized = false;
 	private static bool soundPlaying = false;
+	private static bool soundRecording = false;
 
 	// 0 for directional sounds
 	private static int gameState = 1;
+	private static bool endGame = false;
 
 	public Rigidbody rbDirection;
 	public AudioSource cameraAudioSource;
@@ -60,6 +62,19 @@ public class GameController : MonoBehaviour {
 
 	// Debug text
 	public Text text;
+
+	public bool skipIntroduction;
+	public bool playDirectionalSound;
+
+	private GameObject disCircle;
+
+	public Sprite close;
+	public Sprite mid;
+	public Sprite far;
+
+	void Awake () {
+		disCircle = GameObject.Find ("DisCircle");
+	}
 
 	void Start () {
 		if (!initialized) {
@@ -86,6 +101,7 @@ public class GameController : MonoBehaviour {
 		storyItems = new List<StoryItem> ();
 
 		// Add all story items
+		//storyItems.Add(new StoryItem("first", 59.347095f, 18.074598f));
 		storyItems.Add (new StoryItem ("first", 59.346580f, 18.073124f));
 		storyItems.Add (new StoryItem ("second", 59.347511f, 18.073634f));
 	}
@@ -118,7 +134,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	void Update () {
-		if (soundPlaying) {
+		if (endGame || soundPlaying || soundRecording) {
 			return;
 		}
 
@@ -127,33 +143,34 @@ public class GameController : MonoBehaviour {
 
 			timer--;
 			if (timer <= 0) {
-			//	if (keyCollected) {
-					// Play random directional sound
-			//		int soundIndex = Random.Range (0, directionalSounds.Count);
-			//		directionalAudioSource.clip = directionalSounds [soundIndex];
-			//	} else {
-					directionalAudioSource.clip = whistlingSound;
-			//	}
+				directionalAudioSource.clip = whistlingSound;
 
-				directionalAudioSource.Play ();
+				if (playDirectionalSound) {
+					directionalAudioSource.Play ();
+				}
 
 				timer = SOUND_PERIOD;
 			}
 		}
 
 		if (gameState == 1) {
-			StartCoroutine (PlaySound (binauralSounds [0]));
-			gameState = 0;
+			// Play the introduction sound
+			if (skipIntroduction) {
+				gameState = 0;
+			} else {
+				StartCoroutine (PlaySound (binauralSounds [0]));
+			}
 		}
 
 		if (gameState == 2) {
+			// Got the key and look for the chest
 			StartCoroutine (PlaySound (binauralSounds [2]));
-			gameState = 0;
 		}
 
 		if (gameState == 3) {
+			// The chest has been found
 			StartCoroutine (PlaySound (binauralSounds [4]));
-			gameState = 0;
+			endGame = true;
 		}
 
 	}
@@ -188,6 +205,7 @@ public class GameController : MonoBehaviour {
 		}
 
 		CalculateSoundDirection (currentLatitude, currentLongitude, nextStoryItem.Coordinates.x, nextStoryItem.Coordinates.y);
+		CalculateDistance (currentLatitude, currentLongitude, nextStoryItem.Coordinates.x, nextStoryItem.Coordinates.y);
 	}
 
 	IEnumerator PlaySound(AudioClip clip){
@@ -231,7 +249,6 @@ public class GameController : MonoBehaviour {
 
 		text.text = "Angle: " + angle.ToString ();
 
-		// If vector is in 3rd or 4th quadrant, add PI
 		if(angle < 0){
 			angle += 2 * Mathf.PI;
 		}
@@ -248,38 +265,27 @@ public class GameController : MonoBehaviour {
 
 		float target = angle - deviceOrientation;
 		text.text += "\nTA: " + target.ToString ();
-		target = filterAngle (target);
-		text.text += "\nFTA: " + target.ToString ();
 
 		rbDirection.transform.localEulerAngles = new Vector3 (0f, target, 0f);
 
 	}
 
-	private float filterAngle(float angle){
-		float step = 30;
+	private void CalculateDistance(float startLat, float startLong, float endLat, float endLong){
 
-		bool isNegative = (angle < 0);
-		angle = Mathf.Abs (angle);
+		float distance = Mathf.Sqrt (Mathf.Pow (startLat - endLat, 2f) + Mathf.Pow (startLong - endLong, 2f));
+		// Corresponds to the 20m distance
+		float step = 0.00052299f;
 
-		float minDistance = 0f;
-		int index = -1;
+		text.text += "\n" + step.ToString ();
 
-		for (int i = 0; i < (360 / step); i ++) {
-			float distance = Mathf.Abs (angle - i * step);
-
-			if (index == -1 || distance < minDistance) {
-				index = i;
-				minDistance = distance;
-			}
+		if (distance < step) {
+			disCircle.GetComponent<Image> ().sprite = close;
+		} else if (distance < 2 * step) {
+			disCircle.GetComponent<Image> ().sprite = mid;
+		} else {
+			disCircle.GetComponent<Image> ().sprite = far;
 		}
-
-		float result = index * step;
-		if (isNegative) {
-			result = -result;
-		}
-
-		return result;
-
+		
 	}
 
 }
