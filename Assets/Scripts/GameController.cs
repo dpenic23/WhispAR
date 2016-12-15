@@ -31,7 +31,7 @@ public class GameController : MonoBehaviour {
 	private LocationService locationService;
 
 	// Treshold for calculating is user on the specific spot
-	private float DISTANCE_TRESHOLD = 0.0002f;
+	private float DISTANCE_TRESHOLD = 0.00025f;
 
 	// Collection of all story items in the game
 	private static List<StoryItem> storyItems;
@@ -86,8 +86,8 @@ public class GameController : MonoBehaviour {
 		storyItems = new List<StoryItem> ();
 
 		// Add all story items
-		storyItems.Add (new StoryItem ("first", 59.347112f, 18.074623f));
-		storyItems.Add (new StoryItem ("second", 59.413321f, 17.919596f));
+		storyItems.Add (new StoryItem ("first", 59.346580f, 18.073124f));
+		storyItems.Add (new StoryItem ("second", 59.347511f, 18.073634f));
 	}
 
 	IEnumerator StartGPSTracking() {
