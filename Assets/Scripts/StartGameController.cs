@@ -7,6 +7,8 @@ public class StartGameController : MonoBehaviour {
 
 	private Button startButton;
 
+	public Texture2D progressBar;
+
 	void Start(){
 		startButton = GetComponent<Button> ();
 		startButton.onClick.AddListener (() => {
