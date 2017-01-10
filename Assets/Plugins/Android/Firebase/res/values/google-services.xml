@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="firebase_database_url" translatable="false">https://whisperofthetown.firebaseio.com</string>
+  <string name="gcm_defaultSenderId" translatable="false">65208902793</string>
+  <string name="google_storage_bucket" translatable="false">whisperofthetown.appspot.com</string>
+  <string name="google_api_key" translatable="false">AIzaSyBpO_DfKffkEdG2E-BPH2KKnSGTimBoVNU</string>
+  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBpO_DfKffkEdG2E-BPH2KKnSGTimBoVNU</string>
+  <string name="google_app_id" translatable="false">1:65208902793:android:8a77bd7741996c8c</string>
+  <string name="default_web_client_id" translatable="false">65208902793-vqgp6mmcicsq228h6m5glq24d0aehept.apps.googleusercontent.com</string>
+</resources>

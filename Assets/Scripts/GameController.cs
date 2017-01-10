@@ -41,7 +41,7 @@ public class GameController : MonoBehaviour {
 	private static bool allItemsCollected = false;
 
 	// Directional sound period
-	private int SOUND_PERIOD = 1200;
+	private int SOUND_PERIOD = 600;
 	private int timer;
 
 	private static bool initialized = false;
@@ -72,6 +72,8 @@ public class GameController : MonoBehaviour {
 	public Sprite mid;
 	public Sprite far;
 
+	public FileUpload fileUpload;
+
 	void Awake () {
 		disCircle = GameObject.Find ("DisCircle");
 	}
@@ -82,6 +84,8 @@ public class GameController : MonoBehaviour {
 			nextStoryItem = storyItems [0];
 
 			initialized = true;
+
+			PlayerPrefs.SetInt ("chest", 0);
 		}
 
 		// GPS
@@ -92,6 +96,7 @@ public class GameController : MonoBehaviour {
 		Input.compass.enabled = true;
 
 		// Directional sound
+		directionalAudioSource.clip = whistlingSound;
 		timer = SOUND_PERIOD;
 		timer = 100;
 	}
@@ -101,9 +106,10 @@ public class GameController : MonoBehaviour {
 		storyItems = new List<StoryItem> ();
 
 		// Add all story items
-		//storyItems.Add(new StoryItem("first", 59.347095f, 18.074598f));
 		storyItems.Add (new StoryItem ("first", 59.346580f, 18.073124f));
 		storyItems.Add (new StoryItem ("second", 59.347511f, 18.073634f));
+		//storyItems.Add (new StoryItem ("first", 59.412493f, 17.918796f)); l
+		//storyItems.Add (new StoryItem ("second", 59.413328f, 17.919586f)); l
 	}
 
 	IEnumerator StartGPSTracking() {
@@ -143,8 +149,6 @@ public class GameController : MonoBehaviour {
 
 			timer--;
 			if (timer <= 0) {
-				directionalAudioSource.clip = whistlingSound;
-
 				if (playDirectionalSound) {
 					directionalAudioSource.Play ();
 				}
@@ -157,6 +161,7 @@ public class GameController : MonoBehaviour {
 			// Play the introduction sound
 			if (skipIntroduction) {
 				gameState = 0;
+				//fileUpload.enabled = true;
 			} else {
 				StartCoroutine (PlaySound (binauralSounds [0]));
 			}
@@ -171,6 +176,12 @@ public class GameController : MonoBehaviour {
 			// The chest has been found
 			StartCoroutine (PlaySound (binauralSounds [4]));
 			endGame = true;
+		}
+
+		if (gameState == 4) {
+			gameState = 3;
+			if(PlayerPrefs.GetInt("chest") == 0)
+				SceneManager.LoadScene ("ARScene");
 		}
 
 	}
@@ -200,6 +211,7 @@ public class GameController : MonoBehaviour {
 				}
 
 				soundPlaying = true;
+				directionalAudioSource.Stop ();
 				StartCoroutine (ChangeScene ());
 			}
 		}
@@ -217,6 +229,7 @@ public class GameController : MonoBehaviour {
 
 		soundPlaying = false;
 		gameState = 0;
+		fileUpload.enabled = true;
 	}
 
 	IEnumerator ChangeScene(){
@@ -233,7 +246,8 @@ public class GameController : MonoBehaviour {
 			cameraAudioSource.clip = binauralSounds [3];
 			cameraAudioSource.Play();
 			yield return new WaitForSeconds (binauralSounds[3].length);
-			gameState = 3;
+			soundPlaying = false;
+			gameState = 4;
 		}
 
 		soundPlaying = false;
