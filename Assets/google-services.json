@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "65208902793",
+    "firebase_url": "https://whisperofthetown.firebaseio.com",
+    "project_id": "whisperofthetown",
+    "storage_bucket": "whisperofthetown.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65208902793:android:8a77bd7741996c8c",
+        "android_client_info": {
+          "package_name": "eu.kudan.ar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "65208902793-vqgp6mmcicsq228h6m5glq24d0aehept.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpO_DfKffkEdG2E-BPH2KKnSGTimBoVNU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

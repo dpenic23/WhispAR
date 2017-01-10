@@ -21,7 +21,13 @@ public class ARController : MonoBehaviour {
 
 	void Start(){
 		itemName = PlayerPrefs.GetString ("storyItem");
-		text1.text = itemName;
+		if (itemName == "first") {
+			text1.text = "KEY";
+		} else if (itemName == "second") {
+			text1.text = "CHEST";
+			PlayerPrefs.SetInt ("chest", 1);
+		}
+		//text1.text = itemName;
 	}
 
 	void Update(){
