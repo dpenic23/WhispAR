@@ -45,7 +45,8 @@ public class GameController : MonoBehaviour {
 	private int timer;
 
 	private static bool initialized = false;
-	private static bool soundPlaying = false;
+    private static bool initialLocationChecked = false;
+    private static bool soundPlaying = false;
 	private static bool soundRecording = false;
 
 	// 0 for directional sounds
@@ -108,11 +109,34 @@ public class GameController : MonoBehaviour {
 		// Add all story items
 		storyItems.Add (new StoryItem ("first", 59.346580f, 18.073124f));
 		storyItems.Add (new StoryItem ("second", 59.347511f, 18.073634f));
-		//storyItems.Add (new StoryItem ("first", 59.412493f, 17.918796f)); l
-		//storyItems.Add (new StoryItem ("second", 59.413328f, 17.919586f)); l
-	}
+        //storyItems.Add (new StoryItem ("first", 59.412493f, 17.918796f)); l
+        //storyItems.Add (new StoryItem ("second", 59.413328f, 17.919586f)); l
+    }
 
-	IEnumerator StartGPSTracking() {
+    private void checkInitialLocation() {
+        if (!initialLocationChecked && locationService.status == LocationServiceStatus.Running)
+        {
+            initialLocationChecked = true;
+
+            float currentLatitude = locationService.lastData.latitude;
+            float currentLongitude = locationService.lastData.longitude;
+
+            //  Change all story items so they are in user's vicinity if they are not already
+            if (!(currentLatitude > 59.33 && currentLatitude < 59.36 && currentLongitude > 18.06 && currentLongitude < 18.09))
+            {
+                storyItems.Clear();
+                float itemAngle = Random.Range(0f, 2f * Mathf.PI);
+                storyItems.Add(new StoryItem("first", currentLatitude + 0.0007f * Mathf.Sin(itemAngle), currentLongitude + 0.0007f * Mathf.Cos(itemAngle)));
+                itemAngle = (itemAngle + Mathf.Sign(Random.Range(-1f, 1f)) * 1.7f) % (2f * Mathf.PI);
+                storyItems.Add(new StoryItem("second", currentLatitude + 0.0008f * Mathf.Sin(itemAngle), currentLongitude + 0.0008f * Mathf.Cos(itemAngle)));
+
+                // Increase acceptable distance for the arbitrary story item locations
+                DISTANCE_TRESHOLD = DISTANCE_TRESHOLD * 2f;
+            }
+        }
+    }
+
+    IEnumerator StartGPSTracking() {
 		int maxWait = 10;
 
 		if (!locationService.isEnabledByUser) {
@@ -145,7 +169,9 @@ public class GameController : MonoBehaviour {
 		}
 
 		if (gameState == 0) {
-			TrackPosition ();
+            checkInitialLocation();
+
+            TrackPosition ();
 
 			timer--;
 			if (timer <= 0) {
@@ -165,7 +191,10 @@ public class GameController : MonoBehaviour {
 			} else {
 				StartCoroutine (PlaySound (binauralSounds [0]));
 			}
-		}
+
+            checkInitialLocation();
+
+        }
 
 		if (gameState == 2) {
 			// Got the key and look for the chest
